@@ -1,0 +1,163 @@
+* DONE Purpose of...
+  CLOSED: [2020-02-27 Thu 20:00]
+** Statement Coverage
+   Check if execution of statements is as expected.
+** Branch Coverage
+   Check each branch of a program.
+** Condition Coverage
+   Check each explicit condition.
+** Loop  Coverage
+   Check loop parameter boundaries.
+* Test cases
+** Statement coverage
+   #+begin_src java
+     public String classify() {
+         if (isPossible(sideA, sideB, sideC) &&
+             isValid(sideA, sideB, sideC) &&
+             isInRange(sideA, sideB, sideC)) {
+            
+             if (sideA == sideB && sideB == sideC) return EQUILATERAL_TRIANGLE;
+             if (sideA == sideB || sideB == sideC || sideA == sideC) return ISOSCELES_TRIANGLE;
+             return SCALENE_TRIANGLE;
+         }
+
+         return INVALID_TRIANGLE;
+     }
+   #+end_src
+*** 100% statement coverage
+    Usually else statements + 1
+**** classify
+     4
+*** isRightAngled
+    #+begin_src java
+     public boolean isRightAngled() {
+    	 if (isPossible(sideA, sideB, sideC) &&
+                 isValid(sideA, sideB, sideC) &&
+                 isInRange(sideA, sideB, sideC)) {
+    		
+             if (sideA > sideB && sideA > sideC) return (sideA*sideA) == ((sideB*sideB) + (sideC*sideC));
+             if(sideB > sideA && sideB > sideC) return (sideB*sideB) == ((sideA*sideA) + (sideC*sideC));
+             return (sideC*sideC) == ((sideA*sideA) + (sideB*sideB));
+         }
+
+         return false;
+     }
+    #+end_src
+**** Functions calls
+     #+begin_src java
+     private boolean isPossible(int a , int b, int c) {
+          if (a == b &&
+              a == c &&
+              b != c) return false;
+
+          if (a == b &&
+              b == c &&
+              a != c) return false;
+
+          if (a == c &&
+              b == c &&
+              a != b) return false;
+
+          return true;
+     }
+
+     private boolean isValid(int a, int b, int c) {
+         return (a + b > c &&
+                 a + c > b &&
+                 b + c > a);
+     }
+
+     private boolean isInRange(int a, int b, int c) {
+         if (a < MIN_LENGTH || a > MAX_LENGTH) return false;
+         if (b < MIN_LENGTH || b > MAX_LENGTH) return false;
+         if (c < MIN_LENGTH || c > MAX_LENGTH) return false;
+         return true;
+     }
+     #+end_src
+**** Test cases
+     4 needed
+     | Test case |  A |  B |  C | Result |
+     |-----------+----+----+----+--------|
+     |         0 |  8 |  8 | 12 | false  |
+     |         1 | 12 |  8 |  8 | false  |
+     |         2 |  8 | 12 |  8 | false  |
+     |         3 |  8 |  8 |  8 | false  |
+**** Alternative approach
+     #+begin_src java
+    public boolean isRightAngled() {
+        boolean answer = false;
+        if (isPossible(sideA, sideB, sideC) &&
+            isValid(sideA, sideB, sideC) &&
+            isInRange(sideA, sideB, sideC)) {
+
+            if (sideA > sideB && sideA > sideC) {
+                answer = (sideA*sideA) == ((sideB*sideB) + (sideC*sideC));
+            } else if (sideB > sideA && sideB > sideC) {
+                answer = (sideB*sideB) == ((sideA*sideA) + (sideC*sideC));
+            } else {
+                answer = (sideC*sideC) == ((sideA*sideA) + (sideB*sideB));
+            }
+        }
+        return answer;
+    }
+     #+end_src
+***** Test cases
+      3 as using else statements instead of return.
+** Branch coverage
+   #+begin_src java
+    private boolean isInRange(int a, int b, int c) {
+        if (a < MIN_LENGTH || a > MAX_LENGTH) return false;
+        if (b < MIN_LENGTH || b > MAX_LENGTH) return false;
+        if (c < MIN_LENGTH || c > MAX_LENGTH) return false;
+        return true;
+    }
+   #+end_src
+*** Test cases
+    4 number of end points.
+    | Test case | A | B | C | Result |
+    |-----------+---+---+---+--------|
+    |         0 | 0 | 8 | 8 | false  |
+    |         1 | 8 | 0 | 8 | false  |
+    |         2 | 8 | 8 | 0 | false  |
+    |         3 | 8 | 8 | 8 | true   |
+**** Provide 100% statement coverage?
+     Yes, always.
+*** Generally how many more branch opposed to statement?
+    Double, coz half branches in code needing exercising in statement coverage.
+** Condition coverage
+*** Test cases
+    * Min is conditions + 1
+    * Max is 2^conditions
+**** For last if
+     2^3 conditions
+*** Covers branch coverage?
+    Yes, as each condition goes through all the branches.
+** Loop coverage
+#+begin_src java
+    public void listTrianglesInRange(int min, int max) {
+
+    	System.out.println("List of possible valid triangles:");
+
+        for (int a=min; a <= max; a++) {
+            for (int b=min; b <= max; b++) {
+                for (int c=min; c <= max; c++) {
+                    if (isPossible(a, b, c) &&
+                        isValid(a, b, c) &&
+                        isInRange(a, b, c)) {
+                        System.out.println("(" + a + "," + b + "," + c + ")");
+                    }
+                }
+            }
+        }
+    }
+#+end_src
+*** Test cases for inner-most loop
+    | Test case | min | max |
+    |-----------+-----+-----|
+    |         0 |   9 |   8 |
+    |         1 |   8 |   8 |
+    |         2 |   7 |   8 |
+    |         3 |   0 |   8 |
+*** Testing all loops
+    4^3 = 64
+

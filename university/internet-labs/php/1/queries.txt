@@ -1,0 +1,25 @@
+1. List all rental records (start date, end date) with vehicle's registration number, brand, and customer
+name, sorted by vehicle's categories followed by start date.
+
+SELECT rent_records.start_date, rent_records.end_date, rent_records.reg_no, vehicles.brand, customers.name FROM rent_records
+INNER JOIN customers ON rent_records.customer_id=customers.customer_id
+INNER JOIN vehicles ON rent_records.reg_no=vehicles.reg_no
+
+2. Customer 'Kumar' would like to rent the car ‘GA6666F’ from today for 10 days.
+
+INSERT INTO rent_records (reg_no, customer_id, start_date, end_date)
+SELECT 
+	'GA6666F',
+  customer_id,
+  CURDATE(),
+	DATE_ADD(CURDATE(), INTERVAL 10 DAY)
+FROM customers WHERE name='Kumar'
+
+3. List the vehicles (registration number, brand and description) available for rental (not rented out)
+on '2018-01-20'.
+
+SELECT DISTINCT vehicles.reg_no, vehicles.brand, vehicles.description FROM vehicles, rent_records
+WHERE 
+  NOT EXISTS(SELECT reg_no FROM rent_records WHERE reg_no=vehicles.reg_no)
+  OR 
+  vehicles.reg_no=rent_records.reg_no AND (CAST('2018-01-20' AS DATE) NOT BETWEEN rent_records.start_date AND rent_records.end_date)

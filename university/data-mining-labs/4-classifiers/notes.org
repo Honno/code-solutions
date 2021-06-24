@@ -1,0 +1,290 @@
+* Tasks
+** NaiveBayes 
+*** Good attributes?
+    I like astigmatism and tear-prod-rate
+**** age 
+     Similiar class distribution
+**** spectacle-prescrip
+     Similiar class distribution
+**** astigmatism
+     Exclusivity for soft & hard classes depending on value
+**** tear-prod-rate
+     Exclusive none class for reduced value
+*** Model
+#+BEGIN_SRC text
+Naive Bayes Classifier
+
+                      Class
+Attribute              soft   hard   none
+                     (0.22) (0.19) (0.59)
+==========================================
+age
+  young                  3.0    3.0    5.0
+  pre-presbyopic         3.0    2.0    6.0
+  presbyopic             2.0    2.0    7.0
+  [total]                8.0    7.0   18.0
+
+spectacle-prescrip
+  myope                  3.0    4.0    8.0
+  hypermetrope           4.0    2.0    9.0
+  [total]                7.0    6.0   17.0
+
+astigmatism
+  no                     6.0    1.0    8.
+  0
+  yes                    1.0    5.0    9.0
+  [total]                7.0    6.0   17.0
+
+tear-prod-rate
+  reduced                1.0    1.0   13.0
+  normal                 6.0    5.0    4.0
+  [total]                7.0    6.0   17.0
+#+END_SRC
+**** Why total disparities?
+***** Only two young & soft records
+      Laplace estimator adds 1 to all values.
+***** Class total disparities
+      Larger value set, more laplace +1s to value totals, to increase value total totals.
+*** P(contact-lenses = none | data) = 0.827
+**** Relevant conditional probabilities
+     #+TBLNAME: t0
+     | event   | given | probability |
+     |---------+-------+-------------|
+     | young   | soft  | 3/8         |
+     | young   | hard  | 3/7         |
+     | young   | none  | 5/18        |
+     | myope   | soft  | 3/7         |
+     | myope   | hard  | 4/6         |
+     | myope   | none  | 8/17        |
+     | no      | soft  | 6/7         |
+     | no      | hard  | 1/6         |
+     | no      | none  | 8/17        |
+     | reduced | soft  | 1/7         |
+     | reduced | hard  | 1/6         |
+     | reduced | none  | 13/17       |
+
+     #+TBLNAME: t1
+     | hypothesis | probability |
+     |------------+-------------|
+     | soft       | 5/24        |
+     | hard       | 4/24        |
+     | none       | 15/24       |
+**** Un-normalised likelihoods
+     #+TBLNAME: t2
+     | likelihood |      product |
+     |------------+--------------|
+     | soft       | 4.0998542e-3 |
+     | hard       | 1.3227513e-3 |
+     | none       |  0.029400457 |
+     #+TBLFM: @1$2=remote(t1, @2$2)*remote(t0, @2$3)*remote(t0, @5$3)*remote(t0, @8$3)*remote(t0, @11$3)::@2$2=remote(t1, @3$2)*remote(t0, @3$3)*remote(t0, @6$3)*remote(t0, @9$3)*remote(t0, @12$3)::@3$2=remote(t1, @4$2)*remote(t0, @4$3)*remote(t0, @7$3)*remote(t0, @10$3)*remote(t0, @13$3)
+
+     #+TBLNAME: t3
+     | sum | 0.034823063 |
+     #+TBLFM: @1$2=vsum(remote(t2, @2$2..@4$2))
+**** Normalised likelihoods
+     | hypothesis given data | probability |
+     |-----------------------+-------------|
+     | soft                  |  0.11773388 |
+     | hard                  | 0.037984921 |
+     | none                  |  0.84428119 |
+     | total                 |  0.99999999 |
+     #+TBLFM: @2$2=remote(t2, @2$2) / remote(t3, @1$2)::@3$2=remote(t2, @3$2) / remote(t3, @1$2)::@4$2=remote(t2, @4$2) / remote(t3, @1$2)::@5$2=vsum(@2$2..@4$2)
+*** Unknown tear-prod-rate for #1
+    0.48 prediction (vs 0.827 originally)
+    Less confidence in prediction, as first record made the model treat a reduced tear-prod-rate as more likely of class none.
+*** Iris
+    | Kernal estimator | Accuracy |
+    |------------------+----------|
+    | False            |      96% |
+    | True             | 96.6667% |
+    Not assuming gaussian distribution increased accuracy a bit.
+**** False
+#+BEGIN_SRC text
+                         Class
+Attribute          Iris-setosa Iris-versicolor  Iris-virginica
+                        (0.33)          (0.33)          (0.33)
+===============================================================
+sepallength
+  mean                   4.9913          5.9379          6.5795
+  std. dev.               0.355          0.5042          0.6353
+  weight sum                 50              50              50
+  precision              0.1059          0.1059          0.1059
+
+sepalwidth
+  mean                   3.4015          2.7687          2.9629
+  std. dev.              0.3925          0.3038          0.3088
+  weight sum                 50              50              50
+  precision              0.1091          0.1091          0.1091
+
+petallength
+  mean                   1.4694          4.2452          5.5516
+  std. dev.              0.1782          0.4712          0.5529
+  weight sum                 50              50              50
+  precision              0.1405          0.1405          0.1405
+
+petalwidth
+  mean                   0.2743          1.3097          2.0343
+  std. dev.              0.1096          0.1915          0.2646
+  weight sum                 50              50              50
+  precision              0.1143          0.1143          0.1143
+#+END_SRC
+**** True
+#+BEGIN_SRC text
+sepallength
+  [# kernels]                      14              20              20
+  [std. dev]                   0.2096          0.2995          0.4342
+  [precision]                  0.1059          0.1059          0.1059
+  K1: mean (weight)        4.3412 (1)      4.8706 (1)      4.8706 (1)
+  K2: mean (weight)        4.4471 (4)      4.9765 (2)      5.6118 (1)
+  K3: mean (weight)        4.5529 (4)      5.0824 (1)      5.7176 (1)
+  K4: mean (weight)        4.6588 (2)      5.1882 (1)      5.8235 (3)
+  K5: mean (weight)        4.7647 (5)         5.4 (1)      5.9294 (1)
+  K6: mean (weight)        4.8706 (4)      5.5059 (5)      6.0353 (2)
+  K7: mean (weight)        4.9765 (8)      5.6118 (5)      6.1412 (2)
+  K8: mean (weight)        5.0824 (8)      5.7176 (5)      6.2471 (8)
+  K9: mean (weight)        5.1882 (3)      5.8235 (3)      6.3529 (5)
+  K10: mean (weight)       5.2941 (1)      5.9294 (2)      6.4588 (4)
+  K11: mean (weight)          5.4 (5)      6.0353 (4)      6.6706 (5)
+  K12: mean (weight)       5.5059 (2)      6.1412 (4)      6.7765 (2)
+  K13: mean (weight)       5.7176 (2)      6.2471 (5)      6.8824 (3)
+  K14: mean (weight)       5.8235 (1)      6.3529 (2)      7.0941 (1)
+  K15: mean (weight)               --      6.4588 (1)         7.2 (3)
+  K16: mean (weight)               --      6.5647 (2)      7.3059 (1)
+  K17: mean (weight)               --      6.6706 (3)      7.4118 (1)
+  K18: mean (weight)               --      6.7765 (1)      7.6235 (1)
+  K19: mean (weight)               --      6.8824 (1)      7.7294 (4)
+  K20: mean (weight)               --      6.9882 (1)      7.9412 (1)
+
+sepalwidth
+  [# kernels]                      14              13              12
+  [std. dev]                   0.2931          0.2006          0.2314
+  [precision]                  0.1091          0.1091          0.1091
+  K1: mean (weight)        2.2909 (1)      1.9636 (1)      2.1818 (1)
+  K2: mean (weight)        2.9455 (7)      2.1818 (2)      2.5091 (4)
+  K3: mean (weight)        3.0545 (5)      2.2909 (3)      2.6182 (2)
+  K4: mean (weight)        3.1636 (5)         2.4 (3)      2.7273 (4)
+  K5: mean (weight)        3.2727 (2)      2.5091 (4)      2.8364 (8)
+  K6: mean (weight)        3.3818 (9)      2.6182 (3)     2.9455 (14)
+  K7: mean (weight)        3.4909 (6)      2.7273 (5)      3.0545 (4)
+  K8: mean (weight)           3.6 (2)      2.8364 (6)      3.1636 (5)
+  K9: mean (weight)        3.7091 (3)     2.9455 (15)      3.2727 (3)
+  K10: mean (weight)       3.8182 (4)      3.0545 (3)      3.3818 (2)
+  K11: mean (weight)       3.9273 (2)      3.1636 (3)         3.6 (1)
+  K12: mean (weight)       4.0364 (1)      3.2727 (1)      3.8182 (2)
+  K13: mean (weight)       4.1455 (2)      3.3818 (1)              --
+  K14: mean (weight)       4.3636 (1)              --              --
+
+petallength
+  [# kernels]                       7              14              16
+  [std. dev]                   0.1391           0.298          0.3377
+  [precision]                  0.1405          0.1405          0.1405
+  K1: mean (weight)        0.9833 (1)        2.95 (1)      4.4952 (1)
+  K2: mean (weight)        1.1238 (1)       3.231 (2)      4.7762 (2)
+  K3: mean (weight)        1.2643 (9)      3.5119 (2)      4.9167 (3)
+  K4: mean (weight)       1.4048 (12)      3.6524 (2)     5.0571 (10)
+  K5: mean (weight)       1.5452 (21)      3.7929 (1)      5.1976 (2)
+  K6: mean (weight)        1.6857 (4)      3.9333 (8)      5.3381 (4)
+  K7: mean (weight)        1.9667 (2)      4.0738 (3)      5.4786 (3)
+  K8: mean (weight)                --      4.2143 (4)       5.619 (6)
+  K9: mean (weight)                --      4.3548 (6)      5.7595 (6)
+  K10: mean (weight)               --      4.4952 (7)         5.9 (2)
+  K11: mean (weight)               --      4.6357 (8)      6.0405 (5)
+  K12: mean (weight)               --      4.7762 (2)      6.3214 (1)
+  K13: mean (weight)               --      4.9167 (2)      6.4619 (1)
+  K14: mean (weight)               --      5.0571 (2)      6.6024 (1)
+  K15: mean (weight)               --              --      6.7429 (2)
+  K16: mean (weight)               --              --      6.8833 (1)
+
+petalwidth
+  [# kernels]                       5               8              11
+  [std. dev]                   0.0646          0.1131          0.1616
+  [precision]                  0.1143          0.1143          0.1143
+  K1: mean (weight)        0.1143 (6)      1.0286 (7)      1.3714 (1)
+  K2: mean (weight)       0.2286 (28)      1.1429 (8)      1.4857 (2)
+  K3: mean (weight)        0.3429 (7)     1.2571 (13)         1.6 (1)
+  K4: mean (weight)        0.4571 (8)      1.3714 (7)      1.7143 (1)
+  K5: mean (weight)        0.5714 (1)     1.4857 (10)     1.8286 (11)
+  K6: mean (weight)                --         1.6 (3)      1.9429 (5)
+  K7: mean (weight)                --      1.7143 (1)     2.0571 (12)
+  K8: mean (weight)                --      1.8286 (1)      2.1714 (3)
+  K9: mean (weight)                --              --      2.2857 (8)
+  K10: mean (weight)               --              --         2.4 (3)
+  K11: mean (weight)               --              --      2.5143 (3)
+#+END_SRC
+**** Difference
+     True means a simple bell curve distribution isn't assumed. Kernals are formed which are like, mini bell curve distributions.
+** Comparisons
+#+BEGIN_SRC text
+Tester:     weka.experiment.PairedCorrectedTTester -G 4,5,6 -D 1 -R 2 -S 0.05 -result-matrix "weka.experiment.ResultMatrixPlainText -mean-prec 2 -stddev-prec 2 -col-name-width 0 -row-name-width 25 -mean-width 0 -stddev-width 0 -sig-width 0 -count-width 5 -print-col-names -print-row-names -enum-col-names"
+Analysing:  Percent_correct
+Datasets:   5
+Resultsets: 6
+Confidence: 0.05 (two tailed)
+Sorted by:  -
+Date:       26/02/2020, 13:18
+
+
+Dataset                   (1) ZeroR    | (2) OneR  (3) j48   (4) naive (5) IBk   (6) forest
+------------------------------------------------------------------------------------------
+german_credit            (100)   70.00 |   65.91 *   71.25     75.16 v   71.88     76.33 v
+iris                     (100)   33.33 |   92.53 v   94.73 v   95.53 v   95.40 v   94.67 v
+segment                  (100)   14.29 |   63.99 v   96.76 v   80.17 v   97.15 v   98.14 v
+soybean                  (100)   13.47 |   39.75 v   91.78 v   92.94 v   91.20 v   93.18 v
+vote                     (100)   61.38 |   95.63 v   96.57 v   90.02 v   92.58 v   96.55 v
+------------------------------------------------------------------------------------------
+                               (v/ /*) |   (4/0/1)   (4/1/0)   (5/0/0)   (4/1/0)   (5/0/0)
+
+
+Key:
+(1) rules.ZeroR '' 48055541465867954
+(2) rules.OneR '-B 6' -3459427003147861443
+(3) trees.J48 '-C 0.25 -M 2' -217733168393644444
+(4) bayes.NaiveBayes '' 5995231201785697655
+(5) lazy.IBk '-K 1 -W 0 -A \"weka.core.neighboursearch.LinearNNSearch -A \\\"weka.core.EuclideanDistance -R first-last\\\"\"' -3080186098777067172
+(6) trees.RandomForest '-P 100 -I 100 -num-slots 1 -K 0 -M 1.0 -V 0.001 -S 1' 1116839470751428698
+#+END_SRC
+*** Do any classifiers consistently outperform any of the others?
+    Random forests
+*** Is there a dataset where all of the classifiers perform consistently?
+    Iris and Vote set
+*** Changes base tests
+    For t-tests
+**** Forest as base
+ #+BEGIN_SRC text
+ Dataset                   (6) trees.Ra | (1) rules (2) rules (3) trees (4) bayes (5) lazy.
+ ------------------------------------------------------------------------------------------
+ german_credit            (100)   76.33 |   70.00 *   65.91 *   71.25 *   75.16     71.88 *
+ iris                     (100)   94.67 |   33.33 *   92.53     94.73     95.53     95.40  
+ segment                  (100)   98.14 |   14.29 *   63.99 *   96.76 *   80.17 *   97.15 *
+ soybean                  (100)   93.18 |   13.47 *   39.75 *   91.78     92.94     91.20 *
+ vote                     (100)   96.55 |   61.38 *   95.63     96.57     90.02 *   92.58 *
+ ------------------------------------------------------------------------------------------
+                                (v/ /*) |   (0/0/5)   (0/2/3)   (0/3/2)   (0/3/2)   (0/1/4)
+ #+END_SRC
+**** NaiveBayes
+#+BEGIN_SRC text
+Dataset                   (4) bayes.Na | (1) rules (2) rules (3) trees (5) lazy. (6) trees
+------------------------------------------------------------------------------------------
+german_credit            (100)   75.16 |   70.00 *   65.91 *   71.25 *   71.88     76.33  
+iris                     (100)   95.53 |   33.33 *   92.53 *   94.73     95.40     94.67  
+segment                  (100)   80.17 |   14.29 *   63.99 *   96.76 v   97.15 v   98.14 v
+soybean                  (100)   92.94 |   13.47 *   39.75 *   91.78     91.20 *   93.18  
+vote                     (100)   90.02 |   61.38 *   95.63 v   96.57 v   92.58 v   96.55 v
+------------------------------------------------------------------------------------------
+                               (v/ /*) |   (0/0/5)   (1/0/4)   (2/2/1)   (2/2/1)   (2/3/0)
+#+END_SRC
+**** IBk
+#+BEGIN_SRC text
+
+Dataset                   (5) lazy.IBk | (1) rules (2) rules (3) trees (4) bayes (6) trees
+------------------------------------------------------------------------------------------
+german_credit            (100)   71.88 |   70.00     65.91 *   71.25     75.16     76.33 v
+iris                     (100)   95.40 |   33.33 *   92.53     94.73     95.53     94.67  
+segment                  (100)   97.15 |   14.29 *   63.99 *   96.76     80.17 *   98.14 v
+soybean                  (100)   91.20 |   13.47 *   39.75 *   91.78     92.94 v   93.18 v
+vote                     (100)   92.58 |   61.38 *   95.63 v   96.57 v   90.02 *   96.55 v
+------------------------------------------------------------------------------------------
+                               (v/ /*) |   (0/1/4)   (1/1/3)   (1/4/0)   (1/2/2)   (4/1/0)
+
+
+#+END_SRC

@@ -1,0 +1,122 @@
+* Tasks
+** DONE Understanding the Triangles Problem
+   CLOSED: [2020-02-26 Wed 16:46]
+*** Triangle problem by Glenford Myers
+    The  program  reads  three  integer  values  from  an input  dialog.  The  three  values  represent  the lengths  of  the  sides  of  a  triangle.  The  program displays a message that states whether the triangle is scalene, isosceles, or equilateral.
+**** Programmer response
+     Pretty bad, on average only ~8 of the necessary 14 test cases were determined.
+***** Why?
+      Sum of two sides will always be greater than the remaining side.
+*** State outputs
+    | Lengths                          | Type        |
+    |----------------------------------+-------------|
+    | 3, 4 and 5 units in length       | Scalene     |
+    | 7, 7 and 13 units in length      | Isosceles   |
+    | 10, 15 and 5 units in length     | NA          |
+    | 100, 100 and 100 units in length | Equilateral |
+    | 2, 3 and 5 units in length       | NA          |
+    | 4, 3 and 5 units in length       | Scalene     |
+    | 3, 5 and 3 units in length       | Isosceles   |
+** DONE BVA
+   CLOSED: [2020-02-26 Wed 17:18]
+   Assume range 1-200 (inclusive)
+*** Simple BVA
+    | Side A | Side B | Side C | Expected result |
+    |--------+--------+--------+-----------------|
+    |      1 |    100 |    100 | Isosceles       |
+    |      2 |    100 |    100 | Isosceles       |
+    |    100 |    100 |    100 | Equilateral     |
+    |    199 |    100 |    100 | Isosceles       |
+    |    200 |    100 |    100 | NA              |
+    |    100 |      1 |    100 | Isosceles       |
+    |    100 |      2 |    100 | Isosceles       |
+    |    100 |    199 |    100 | Isosceles       |
+    |    100 |    200 |    100 | NA              |
+    |    100 |    100 |      1 | Isosceles       |
+*** Robust Worst Case
+    | Side A | Side B | Side C | Expected result |
+    |--------+--------+--------+-----------------|
+    |      0 |      0 |      0 | Invalid         |
+    |      1 |      0 |      0 | Invalid         |
+    |      2 |      0 |      0 | Invalid         |
+    |    100 |      0 |      0 | Invalid         |
+    |    199 |      0 |      0 | Invalid         |
+    |    200 |      0 |      0 | Invalid         |
+    |    201 |      0 |      0 | Invalid         |
+    |      0 |      1 |      0 | Invalid         |
+    |      1 |      1 |      0 | Invalid         |
+    |      2 |      1 |      0 | Invalid         |
+** DONE ECP
+   CLOSED: [2020-02-26 Wed 17:38]
+*** Valid and Invalid values
+**** Valid
+     * Scalene
+     * Isosceles
+     * Equilateral
+     * NA
+**** Invalid
+*** Weak Normal Equivalence Class Partitioning
+    | Side A | Side B | Side C | Expected result |
+    |--------+--------+--------+-----------------|
+    |     24 |     32 |     20 | Scalene         |
+    |     16 |     16 |     12 | Isosceles       |
+    |      8 |      8 |      8 | Equilateral     |
+    |     64 |    128 |     48 | NA              |
+**** More test cases for strong normal ECP?
+     No as all classes are covered.
+** DONE Decision tables
+   CLOSED: [2020-02-26 Wed 18:03]
+   |              | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 |
+   |--------------+---+---+---+---+---+---+---+---+---+----+----|
+   | a < b + c    | F | T | T | T | T | T | T | T | T | T  | T  |
+   | b < a + c    | - | F | T | T | T | T | T | T | T | T  | T  |
+   | c < a + b    | - | - | F | T | T | T | T | T | T | T  | T  |
+   | a = b        | - | - | - | T | T | T | F | F | T | F  | F  |
+   | b = c        | - | - | - | T | T | F | F | T | F | T  | F  |
+   | c = a        | - | - | - | T | F | F | T | F | T | T  | F  |
+   |--------------+---+---+---+---+---+---+---+---+---+----+----|
+   | Not triangle | X | X | X |   |   |   |   |   |   |    |    |
+   | Scalene      |   |   |   |   |   |   |   |   |   |    | X  |
+   | Isosceles    |   |   |   |   |   |   | X | X |   |    |    |
+   | Equilateral  |   |   |   | X |   |   |   |   |   |    |    |
+   | Not possible |   |   |   |   | X | X |   |   | X | x  |    |
+   Not possible i.e. equality would invalidate comparisons.
+* Notes
+** Black-box testing
+   Examining functionality of application, without caring about implementation details.
+** Techniques
+*** Boundary value analysis (BVA)
+**** Simple
+     Valid values i.e. lie in specificied range.
+***** Single fault assumption
+      Independence amongst input variables
+***** Boundary selection
+      min, min + 1, nominal, max – 1, max
+****** e.g. range 1 to 10
+       1, 2, 5, 9, 10
+**** Robust Simple
+     Simple, plus considers invalid values.
+***** Boundary selection
+      min – 1, min, min + 1, nominal, max – 1, max, max + 1
+****** e.g. 
+       0, 1, 2, 5, 9, 10, 11
+**** Worst Case
+     Multiple fault assumption, i.e. dependence amongst input variables to result in multiple simultaneous faults.
+**** Robust Worst Case
+     Considers invalid boundary values
+*** Equivalence class partitioning (ECP)
+    Assume similiar inputs invoke similiar responses, so reduce test cases by partitioning inputs/outputs into classes.
+**** Types
+     You get the gist
+***** Weak Normal
+***** Strong Normal
+      Dependance
+***** Weak Robust
+      Invalids
+***** Strong Robust
+**** General approach
+     Until all valid equivalence classes have been covered, write a new test case to cover as many of the uncovered equivalence classes as possible.
+     Until all invalid equivalence classes have been covered, write a new test case to cover one and only one of the uncovered invalid equivalence.
+     classes.
+*** Decision tables (DT)
+    Model complex logic by associating independent conditions with several actions.

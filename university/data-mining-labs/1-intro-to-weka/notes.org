@@ -1,0 +1,44 @@
+* Tasks
+** File format
+*** DONE New records
+    CLOSED: [2020-02-08 Sat 13:16]
+*** TODO New class
+** DONE Using data as a training set for classification
+   CLOSED: [2020-02-08 Sat 14:20]
+   In practice not a good idea—we wantthe model perform well on /unseen/ data
+***  Trees J48 (default settings)
+    Java implementation of C4.5, a popular algorithm used to generate a decision tree
+**** Summary
+     | Correctly Classified Instances   | 855 (85.5%) |
+     | Incorrectly Classified Instances | 145 (14.5%) |
+     | Kappa statistic                  |    0.6251 |
+     | Mean absolute error              |    0.2312 |
+     | Root mean squared error          |      0.34 |
+     | Relative absolute error          |  55.0377% |
+     | Root relative squared error      |  74.2015% |
+     | Total Number of Instances        |      1000 |
+**** Confusion matrix
+     |   a |   b |   |
+     | 669 |  31 | a |
+     | 114 | 186 | b |
+***  Trees J48 (binarysplits)
+**** Summary
+     | Correctly Classified Instances   | 905 (90.5%) |
+     | Incorrectly Classified Instances |   95 (9.5%) |
+     | Kappa statistic                  |      0.7627 |
+     | Mean absolute error              |      0.1601 |
+     | Root mean squared error          |      0.2829 |
+     | Relative absolute error          |    38.1093% |
+     | Root relative squared error      |    61.7444% |
+     | Total Number of Instances        |        1000 |
+**** Confusion matrix
+     |   a |   b |   |
+     | 677 |  23 | a |
+     |  72 | 228 | b |
+
+* Notes
+** Red vs Blue
+   Arbitary colours denoting class of value(s):
+   * Red: Class is 'good'
+   * Blue: Class is 'bad'
+

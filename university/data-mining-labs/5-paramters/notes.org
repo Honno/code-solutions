@@ -1,0 +1,119 @@
+* Tasks
+** Decision Tree Pruning
+   Adjusting confidence factor of j48
+*** Confidence factor
+    Determines amount of pruning
+*** credit-a
+**** Possible classification methods
+***** Decision tree branches
+      * A9
+      * A10
+****** Best discrete
+       A9 right
+***** Best pair of numeric
+      * A11 kinda skews
+      * Nothing else?
+**** Qs
+***** Why trees not sensitive to scaling?
+      Use of relative ranges
+***** Reducing skewness to bell-shaped distributins
+      * Square roots if the attribute values are all non negative
+      * Logarithms if strictly greater than zero
+      * Rank transformations
+****** j48 doesnt care
+**** Default run
+     | Accuracy      | 86.1% |
+     | No. of leaves |    30 |
+     | Tree size     |    42 |
+***** Branches correlate with initial thinking?
+      * A9 and 10 used first
+      * A11 not used at all
+        * A3, A15, A2, A14
+**** Modified runs
+     | Reduced Error Pruning | Confidence Factor | Accuracy | Number of Leaves | Tree Size |
+     |-----------------------+-------------------+----------+------------------+-----------|
+     | False                 |               0.1 |    85.8% |                9 |        15 |
+     | False                 |              0.15 |    85.8% |                9 |        15 |
+     | False                 |              0.25 |    86.1% |               30 |        42 |
+     | False                 |              0.35 |    86.2% |               35 |        49 |
+     | True                  |               N/A |    83.3% |               30 |        43 |
+***** Confidence factor
+      Computes upper bound on generalisation error
+***** Reduced error pruning
+      Seperate pruning dataset is used
+***** Observations
+      * Higher confidence factor increases accuracy
+      * Reduced error pruning not as effective
+****** TODO Same for other sets?
+       * Higher confidence would increase accuracy as there's more decisions/granularity, just be more verbose then needed.
+       * Reduced error pruning? No idea
+** Determining k for kNN
+*** Lazy classifiers
+    Do not explicitly build models from training data
+*** Setting k
+    |  k |  Accuracy |
+    |----+-----------|
+    |  1 | 78.632479 |
+    |  2 | 81.623932 |
+    |  3 | 82.905983 |
+    |  4 | 82.478632 |
+    |  5 | 84.188034 |
+    |  6 | 84.188034 |
+    |  7 | 84.188034 |
+    |  8 | 84.615385 |
+    |  9[fn:1] | 85.897436 |
+    | 10 | 84.188034 |
+[fn:1] best k value
+*** Cross validation
+    7 is chosen with accuracy 84.2553
+**** Previous experiment?
+     Different. Uses different accuracy measure to compare runs?
+**** Max is 6
+     5 is picked with accuracy 83.4043
+** Benchmark algo comparisons
+*** audiology dataset
+**** Difference
+     Loads of classes
+***** Implications
+      Different algorithm performance
+**** Class type
+     Nominal
+**** Data types
+     * boolean
+     * ordinal
+*** Experiment
+**** j48
+***** Confidence factor
+      0.5 for more decisions/granularity
+**** kNN
+***** k value
+      Let cross validation decide (limit up to 10 for performance)
+**** Comparisons
+     #+begin_src
+Dataset                   (1) trees.J4 | (2) lazy.
+--------------------------------------------------
+audiology                (100)   77.18 |   78.43  
+--------------------------------------------------
+                               (v/ /*) |   (0/1/0)
+     #+end_src
+***** Conclusion
+      Use kNN, but not a big deal.
+****** k value
+       How do I find out what K was used in the final run?
+*** With CPU dataset
+**** Dataset types
+     Numeric, including class
+**** Results
+     Used gaussian thingy instead of paceregression (as it wasnt listed hmm)
+     #+begin_src 
+Dataset                   (1) function | (2) funct
+--------------------------------------------------
+cpu                      (100)   46.19 |   79.63 v
+--------------------------------------------------
+                               (v/ /*) |   (1/0/0)
+     #+end_src
+**** Regression vs classification
+     Regression has a numeric function for a class
+**** Results using j48
+     Wont work coz class is numeric, not nominal
+

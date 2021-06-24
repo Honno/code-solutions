@@ -1,0 +1,365 @@
+* Tasks
+  How models can be evaluated in Weka.
+** Explorer
+   Evaluate accuracy of model.
+   | Testing Process           | Acc. on training | Acc. on challenge |
+   |---------------------------+------------------+-------------------|
+   | Training set              |    98.8016[fn:1] |     92.0667[fn:2] |
+   | Percentage split 10%      |          88.1657 |           92.0667 |
+   | Percentage split 25%      |          89.1652 |           92.0667 |
+   | Percentage split 33%      |          90.4573 |           92.0667 |
+   | Percentage split 50%      |             93.6 |           92.0667 |
+   | Percentage split 66%      |          92.1569 |           92.0667 |
+   | Percentage split 75%      |          89.8936 |           92.0667 |
+   | Percentage split 90%      |          89.3333 |           92.0667 |
+   | Cross-validation 2 folds  |          90.8123 |           92.0667 |
+   | Cross-validation 5 folds  |          93.3422 |           92.0667 |
+   | Cross-validation 10 folds |          93.6085 |           92.0667 |
+   | Cross-validation 20 folds |          94.4075 |           92.0667 |
+[fn:1] Biased coz its from itsel
+[fn:2] Best "independent" value
+*** region-pixel-count, verge-sd, hedge-sd
+**** region-pixel-count
+     Every record has the same value (9), so useless.
+***** Remove
+      weka.filters.unsupervised.attribute.Remove -R 3
+**** verge-sd & hedge-sd (standard deviations)
+     Mostly occupies same spot, except for some outliers.
+     Large contrast differences (outliers) probably indicates image of boundary between two things.
+     Different class mix when looking at just outliers. Just a fluke, or useful? Probably a fluke.
+***** Remove records with extreme values (x > Q3 + 6*IQR)
+      weka.filters.unsupervised.attribute.InterquartileRange -R 6,8 -O 3.0 -E 6.0
+      weka.filters.unsupervised.instance.RemoveWithValues -S 0.0 -C 21 -L last
+      weka.filters.unsupervised.attribute.Remove -R 20,21
+*** Acc. on challenge ubiquotous results for percentage splits
+    Model generated in Explorer is train on the whole training set, regardless of how its split.
+*** More folders in cross validation
+    Seemingly increases accuracy of model.
+** Experimenter
+*** Iris—OneR
+    #+BEGIN_SRC text
+Tester:     weka.experiment.PairedCorrectedTTester -G 3,4,5 -D 1 -R 2 -S 0.05 -result-matrix "weka.experiment.ResultMatrixPlainText -mean-prec 2 -stddev-prec 2 -col-name-width 0 -row-name-width 25 -mean-width 2 -stddev-width 2 -sig-width 1 -count-width 5 -print-col-names -print-row-names -enum-col-names"
+Analysing:  Percent_correct
+Datasets:   1
+Resultsets: 1
+Confidence: 0.05 (two tailed)
+Sorted by:  -
+Date:       20/02/2020, 13:50
+
+
+Dataset                   (1) rules.OneR
+----------------------------------------
+iris                      (10)   94.71 |
+----------------------------------------
+(v/ /*)                                |
+
+
+Key:
+(1) rules.OneR '-B 6' -3459427003147861443
+
+    #+END_SRC
+*** Iris & Soybean—OneR
+    #+BEGIN_SRC text
+Tester:     weka.experiment.PairedCorrectedTTester -G 3,4,5 -D 1 -R 2 -S 0.05 -result-matrix "weka.experiment.ResultMatrixPlainText -mean-prec 2 -stddev-prec 2 -col-name-width 0 -row-name-width 25 -mean-width 2 -stddev-width 2 -sig-width 1 -count-width 5 -print-col-names -print-row-names -enum-col-names"
+Analysing:  Percent_correct
+Datasets:   2
+Resultsets: 1
+Confidence: 0.05 (two tailed)
+Sorted by:  -
+Date:       20/02/2020, 13:47
+
+
+Dataset                   (1) rules.OneR
+----------------------------------------
+iris                      (10)   94.71 |
+soybean                   (10)   40.18 |
+----------------------------------------
+(v/ /*)                                |
+
+
+Key:
+(1) rules.OneR '-B 6' -3459427003147861443
+
+    #+END_SRC
+
+*** Iris—OneR & NaiveBayes
+    #+BEGIN_SRC text
+Tester:     weka.experiment.PairedCorrectedTTester -G 3,4,5 -D 1 -R 2 -S 0.05 -result-matrix "weka.experiment.ResultMatrixPlainText -mean-prec 2 -stddev-prec 2 -col-name-width 0 -row-name-width 25 -mean-width 2 -stddev-width 2 -sig-width 1 -count-width 5 -print-col-names -print-row-names -enum-col-names"
+Analysing:  Percent_correct
+Datasets:   1
+Resultsets: 2
+Confidence: 0.05 (two tailed)
+Sorted by:  -
+Date:       20/02/2020, 13:51
+
+
+Dataset                   (1) rules.On | (2) bayes
+--------------------------------------------------
+iris                      (10)   94.71 |   96.08  
+--------------------------------------------------
+                               (v/ /*) |   (0/1/0)
+
+
+Key:
+(1) rules.OneR '-B 6' -3459427003147861443
+(2) bayes.NaiveBayes '' 5995231201785697655
+
+    #+END_SRC
+**** Significane=0.8 (instead of 0.05)
+     #+BEGIN_SRC text
+ Tester:     weka.experiment.PairedCorrectedTTester -G 3,4,5 -D 1 -R 2 -S 0.8 -result-matrix "weka.experiment.ResultMatrixPlainText -mean-prec 2 -stddev-prec 2 -col-name-width 0 -row-name-width 25 -mean-width 2 -stddev-width 2 -sig-width 1 -count-width 5 -print-col-names -print-row-names -enum-col-names"
+ Analysing:  Percent_correct
+ Datasets:   1
+ Resultsets: 2
+ Confidence: 0.8 (two tailed)
+ Sorted by:  -
+ Date:       20/02/2020, 14:01
+
+
+ Dataset                   (1) rules.On | (2) bayes
+ --------------------------------------------------
+ iris                      (10)   94.71 |   96.08 v
+ --------------------------------------------------
+                                (v/ /*) |   (1/0/0)
+
+
+ Key:
+ (1) rules.OneR '-B 6' -3459427003147861443
+ (2) bayes.NaiveBayes '' 5995231201785697655
+
+     #+END_SRC
+**** 100 iterations (instead of 10)
+     #+BEGIN_SRC text
+ Tester:     weka.experiment.PairedCorrectedTTester -G 3,4,5 -D 1 -R 2 -S 0.05 -result-matrix "weka.experiment.ResultMatrixPlainText -mean-prec 2 -stddev-prec 2 -col-name-width 0 -row-name-width 25 -mean-width 2 -stddev-width 2 -sig-width 1 -count-width 5 -print-col-names -print-row-names -enum-col-names"
+ Analysing:  Percent_correct
+ Datasets:   1
+ Resultsets: 2
+ Confidence: 0.05 (two tailed)
+ Sorted by:  -
+ Date:       20/02/2020, 14:02
+
+
+ Dataset                   (1) rules.On | (2) bayes
+ --------------------------------------------------
+ iris                     (100)   93.82 |   95.98  
+ --------------------------------------------------
+                                (v/ /*) |   (0/1/0)
+
+
+ Key:
+ (1) rules.OneR '-B 6' -3459427003147861443
+ (2) bayes.NaiveBayes '' 5995231201785697655
+
+
+     #+END_SRC
+**** 1 iteration
+     #+BEGIN_SRC text
+ Tester:     weka.experiment.PairedCorrectedTTester -G 3,4,5 -D 1 -R 2 -S 0.05 -result-matrix "weka.experiment.ResultMatrixPlainText -mean-prec 2 -stddev-prec 2 -col-name-width 0 -row-name-width 25 -mean-width 2 -stddev-width 2 -sig-width 1 -count-width 5 -print-col-names -print-row-names -enum-col-names"
+ Analysing:  Percent_correct
+ Datasets:   1
+ Resultsets: 2
+ Confidence: 0.05 (two tailed)
+ Sorted by:  -
+ Date:       20/02/2020, 14:03
+
+
+ Dataset                   (1) rules.On | (2) bayes
+ --------------------------------------------------
+ iris                       (1)   96.08 |   96.08  
+ --------------------------------------------------
+                                (v/ /*) |   (0/1/0)
+
+
+ Key:
+ (1) rules.OneR '-B 6' -3459427003147861443
+ (2) bayes.NaiveBayes '' 5995231201785697655
+
+     #+END_SRC
+*** Iris & Soybean—OneR & NaiveBayes
+    #+BEGIN_SRC text
+Tester:     weka.experiment.PairedCorrectedTTester -G 3,4,5 -D 1 -R 2 -S 0.05 -result-matrix "weka.experiment.ResultMatrixPlainText -mean-prec 2 -stddev-prec 2 -col-name-width 0 -row-name-width 25 -mean-width 2 -stddev-width 2 -sig-width 1 -count-width 5 -print-col-names -print-row-names -enum-col-names"
+Analysing:  Percent_correct
+Datasets:   2
+Resultsets: 2
+Confidence: 0.05 (two tailed)
+Sorted by:  -
+Date:       20/02/2020, 14:05
+
+
+Dataset                   (1) rules.On | (2) bayes
+--------------------------------------------------
+iris                      (10)   94.71 |   96.08  
+soybean                   (10)   40.18 |   91.36 v
+--------------------------------------------------
+                               (v/ /*) |   (1/1/0)
+
+
+Key:
+(1) rules.OneR '-B 6' -3459427003147861443
+(2) bayes.NaiveBayes '' 5995231201785697655
+
+    #+END_SRC
+**** Why naivebayes performs much better than oner for soybean?
+     OneR (one attribute rule) finds the attribute that makes the fewest prediction errorsOneR (one attribute rule) finds the attribute that makes the fewest prediction errors
+***** Iris
+      Petal width ranges to predict class pretty well
+***** Soybean
+      fruit-spots is the best it can use
+      | attribute value    | predicted class       |
+      |--------------------+-----------------------|
+      | absent             | alternarialeaf-spot   |
+      | colored            | frog-eye-leaf-spot    |
+      | brown-w/blk-specks | anthracnose           |
+      | distort            | diaporthe-stem-canker |
+      | dna                | diaporthe-stem-canker |
+      | ?                  | phytophthora-rot      |
+*** Iris & Soybean—OneR + NaiveBayes + J48
+    #+BEGIN_SRC text
+Tester:     weka.experiment.PairedCorrectedTTester -G 3,4,5 -D 1 -R 2 -S 0.05 -V -result-matrix "weka.experiment.ResultMatrixPlainText -mean-prec 2 -stddev-prec 2 -col-name-width 0 -row-name-width 25 -mean-width 2 -stddev-width 2 -sig-width 1 -count-width 5 -show-stddev -print-col-names -print-row-names -enum-col-names"
+Analysing:  Percent_correct
+Datasets:   2
+Resultsets: 3
+Confidence: 0.05 (two tailed)
+Sorted by:  -
+Date:       20/02/2020, 14:18
+
+
+Dataset                   (1) rules.OneR '-B | (2) bayes.Naive (3) trees.J48 '
+------------------------------------------------------------------------------
+iris                      (10)   94.71(2.45) |   96.08(2.77)     94.90(2.95)  
+soybean                   (10)   40.18(0.70) |   91.36(1.47) v   88.74(1.00) v
+------------------------------------------------------------------------------
+                                     (v/ /*) |         (1/1/0)         (1/1/0)
+
+
+Key:
+(1) rules.OneR '-B 6' -3459427003147861443
+(2) bayes.NaiveBayes '' 5995231201785697655
+(3) trees.J48 '-C 0.25 -M 2' -217733168393644444
+
+    #+END_SRC
+**** j48 vs oner
+     Much better
+**** j48 vs naivebayes
+     Not as good
+*** Everything w/ cross validation
+    #+BEGIN_SRC text
+Tester:     weka.experiment.PairedCorrectedTTester -G 4,5,6 -D 1 -R 2 -S 1.0 -V -result-matrix "weka.experiment.ResultMatrixPlainText -mean-prec 2 -stddev-prec 2 -col-name-width 0 -row-name-width 25 -mean-width 2 -stddev-width 2 -sig-width 1 -count-width 5 -show-stddev -print-col-names -print-row-names -enum-col-names"
+Analysing:  Percent_correct
+Datasets:   2
+Resultsets: 3
+Confidence: 1.0 (two tailed)
+Sorted by:  -
+Date:       20/02/2020, 14:21
+
+
+Dataset                   (1) rules.OneR '-B | (2) bayes.Naive (3) trees.J48 '
+------------------------------------------------------------------------------
+iris                     (100)   92.53(5.47) |   95.53(5.02) v   94.73(5.30) v
+soybean                  (100)   39.75(2.71) |   92.94(2.92) v   91.78(3.19) v
+------------------------------------------------------------------------------
+                                     (v/ /*) |         (2/0/0)         (2/0/0)
+
+
+Key:
+(1) rules.OneR '-B 6' -3459427003147861443
+(2) bayes.NaiveBayes '' 5995231201785697655
+(3) trees.J48 '-C 0.25 -M 2' -217733168393644444
+
+    #+END_SRC
+
+**** 20 folds
+     #+BEGIN_SRC text
+Tester:     weka.experiment.PairedCorrectedTTester -G 4,5,6 -D 1 -R 2 -S 1.0 -V -result-matrix "weka.experiment.ResultMatrixPlainText -mean-prec 2 -stddev-prec 2 -col-name-width 0 -row-name-width 25 -mean-width 2 -stddev-width 2 -sig-width 1 -count-width 5 -show-stddev -print-col-names -print-row-names -enum-col-names"
+Analysing:  Percent_correct
+Datasets:   2
+Resultsets: 3
+Confidence: 1.0 (two tailed)
+Sorted by:  -
+Date:       20/02/2020, 14:22
+
+
+Dataset                   (1) rules.OneR '-B | (2) bayes.Naive (3) trees.J48 '
+------------------------------------------------------------------------------
+iris                     (200)   92.50(5.26) |   95.53(5.14) v   94.93(5.14) v
+soybean                  (200)   39.85(2.60) |   92.93(2.72) v   91.97(3.05) v
+------------------------------------------------------------------------------
+                                     (v/ /*) |         (2/0/0)         (2/0/0)
+
+
+Key:
+(1) rules.OneR '-B 6' -3459427003147861443
+(2) bayes.NaiveBayes '' 5995231201785697655
+(3) trees.J48 '-C 0.25 -M 2' -217733168393644444
+
+     #+END_SRC
+
+*** 50% percentage split
+    #+BEGIN_SRC text
+Tester:     weka.experiment.PairedCorrectedTTester -G 3,4,5 -D 1 -R 2 -S 1.0 -V -result-matrix "weka.experiment.ResultMatrixPlainText -mean-prec 2 -stddev-prec 2 -col-name-width 0 -row-name-width 25 -mean-width 2 -stddev-width 2 -sig-width 1 -count-width 5 -show-stddev -print-col-names -print-row-names -enum-col-names"
+Analysing:  Percent_correct
+Datasets:   2
+Resultsets: 3
+Confidence: 1.0 (two tailed)
+Sorted by:  -
+Date:       20/02/2020, 14:22
+
+
+Dataset                   (1) rules.OneR '-B | (2) bayes.Naive (3) trees.J48 '
+------------------------------------------------------------------------------
+iris                      (20)   93.80(1.58) |   94.80(2.11) v   93.33(1.98) *
+soybean                   (20)   40.06(0.81) |   90.73(1.13) v   87.61(1.95) v
+------------------------------------------------------------------------------
+                                     (v/ /*) |         (2/0/0)         (1/0/1)
+
+
+Key:
+(1) rules.OneR '-B 6' -3459427003147861443
+(2) bayes.NaiveBayes '' 5995231201785697655
+(3) trees.J48 '-C 0.25 -M 2' -217733168393644444
+
+
+    #+END_SRC
+
+* Notes
+** Experimenter
+   * Run multiple classifiers against multiple data sets
+   * Perform statistical comparisons of results
+   * More effecient for running series of experiments
+** Datasets
+*** Segment data
+    * segment-test
+      * training
+      * evaluation
+    * segment-challenge
+      * evaluating "true" accuracy
+      * has more stuff to get better estimates
+*** Image segmentation problem
+    * 7 outdoor images
+    * segmented by hand
+      create classificaiton for every pixel
+    * every instance is a 3px*3px region
+    * 19 attributes
+    * 7 classes
+
+*** Attributes
+** Filters
+*** IQR
+    Outliers:
+    Q3 + OF*IQR < x <= Q3 + EVF*IQR
+    or
+    Q1 - EVF*IQR <= x < Q1 - OF*IQR
+
+    Extreme values:
+    x > Q3 + EVF*IQR
+    or
+    x < Q1 - EVF*IQR
+
+    Key:
+    Q1 = 25% quartile
+    Q3 = 75% quartile
+    IQR = Interquartile Range, difference between Q1 and Q3
+    OF = Outlier Factor
+    EVF = Extreme Value Factor 
+*** RemoveWithValues
+    Nominal indices thingy cares about the range of possible values for a given nominal attribute

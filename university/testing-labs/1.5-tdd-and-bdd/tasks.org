@@ -1,0 +1,13 @@
+* TODO User story
+** Title
+** Narrative
+** Acceptance Criteria
+* Associated scenarios
+** TODO Simple calculation
+   Involving two operands, one operator
+** TODO Complex calculation
+   Involving four operands, three different operators
+** TODO Erroneous calculation
+   Cause the calculator to report a divide by zero error
+* TODO Test implementations
+* TODO BDD framework step definitions

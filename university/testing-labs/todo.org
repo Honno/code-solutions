@@ -1,0 +1,2 @@
+* DONE Git ignore and remove whatever files I shouldn't be adding in intelij
+  CLOSED: [2020-02-09 Sun 18:42]

@@ -1,0 +1,94 @@
+* Tasks
+** DONE Understand BDD terminology
+   CLOSED: [2020-02-09 Sun 17:36]
+*** Second generation
+    BDD is seen as the second generation of TDD.
+*** Outside-in
+    Approach taking by user stories to specify behaviour. Outcomes are identified first, and then BDD expands to the feature set that achieves these outcomes.
+*** Pull-based
+    Rather than delievering features by a deadline, user stories are prioritised by their value.
+*** Multiple-stakeholder
+    Stories are the result of communications between all stakeholders involved.
+*** Multiple-scale
+    Stories are made at different levels of the feature set.
+*** High-automation
+    Automated processes are used where possible.
+*** Ubiquitous language
+    The language of user stories is consistent, transferably beyond one project.
+** DONE Comparing BDD & TDD
+   CLOSED: [2020-02-09 Sun 17:40]
+   | Statement                             | TDD | BDD |
+   |---------------------------------------+-----+-----|
+   | Encourages a test-first approach      | Y   | Y   |
+   | Focuses on the values of the customer | N   | Y   |
+   | In practice, has a single stakeholder | Y   | N   |
+   | Is an agile methodology               | N   | Y   |
+** DONE Writing user stories
+   CLOSED: [2020-02-09 Sun 18:02]
+*** User stories
+    Only title and narrative.
+**** A University student purchasing a parking pass
+     | As a      | University student                        |
+     | I want to | Purchase a parking ticket                 |
+     | So that   | Park my car in the university parking lot |
+**** A bank customer withdrawing cash from an ATM
+     | As a      | Bank customer                          |
+     | I want to | Withdraw cash from an ATM              |
+     | So that   | I can withdraw cash regardless of time |
+**** A book store customer searching for a book by its author
+     | As a      | Book store customer        |
+     | I want to | Search books by its author |
+     | So that   | Find books by said author  |
+*** Why is it advantageous to include the benefit in a user story?
+    Stakeholders consider /why/ a feature is required.
+*** What is implied if a feature in a user story does not actually deliver the benefit attributed to it in the same user story?
+    A story is missing, hidden or incomplete.
+** DONE Writing scenarios
+   CLOSED: [2020-02-09 Sun 18:37]
+*** Member logins into website
+    | As a    | member                               |
+    | I want  | to login to the website              |
+    | So that | I can access member only information |
+    Acceptance Criteria scenarios:
+**** 1. Login with 'validUsername' and 'validPassword', and 'Rember Me' option ticked
+     | Given | member is on the login page       |
+     | And   | has entered a valid username      |
+     | And   | has entered a valid password      |
+     | And   | ticked rember me                  |
+     | And   | authentication service is online  |
+     | When  | member presses login              |
+     | Then  | member redirected to welcome page |
+     | And   | a cookie session is made          |
+**** 2. Attempt login with ‘validUsername’ and ‘invalidPassword’
+     | Given | member is on the login page     |
+     | And   | has entered a valid username    |
+     | And   | has entered an invalid password |
+     | And   | authentication service is online  |
+     | When  | member presses login            |
+     | Then  | member remains on login page    |
+     | And   | error message is displayed      |
+**** TODO 3
+     | Given | context           |
+     | And   | some more context |
+     | When  | event             |
+     | Then  | outcome           |
+     | And   | another outcome   |
+**** 4. Scenario 2 but restriction of 3 unsucessful login attempts
+     | Given | member is on the login page                   |
+     | And   | has entered a valid username                  |
+     | And   | has entered an invalid password               |
+     | And   | after two previous unsuccessful login attemps |
+     | And   | authentication service is online              |
+     | When  | member presses login                          |
+     | Then  | member remains on login page                  |
+     | And   | max attempts message is displayed             |
+** Game of Life
+*** TODO Understanding
+*** TODO Writing user stories
+*** TODO Writing acceptance tests
+*** DONE Executing user stories
+    CLOSED: [2020-02-09 Sun 19:09]
+
+* Notes
+** Code
+*** Make sure classpath is the test folder for run configurations

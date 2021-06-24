@@ -1,0 +1,77 @@
+* j48
+** No cost
+   77.8878%
+   #+begin_src 
+   a   b   <-- classified as
+ 138  27 |   a = no
+  40  98 |   b = yes
+   #+end_src
+** Cost'd
+*** Cost matrix
+    |  0.0 | 1.0 |
+    | 10.0 | 0.0 |
+*** Confustion matrix
+    | 58 | 107 |
+    |  6 | 132 |
+*** Element-wise
+    167
+    |  0 | 107 |
+    | 60 | 0   |
+** No cost element wise
+   0 + 27 + 400 + 0 = 427
+*** Comparison
+    Using cost matrix significantly reduced the cost
+* Naive Bayes
+  | Not cost sensitive | 302 |
+  | Cost sensitive     | 209 |
+* Weight outcomes of normal outcomes
+** Naive Bayes
+   210
+** j48
+   235
+* MetaCost
+  | j48    | 173 |
+  | nBayes | 228 |
+** j48
+   Complex
+   #+begin_src 
+  thal = fixed_defect: yes (18.12)
+  thal = normal
+  |   oldpeak <= 1.6
+  |   |   exang = no
+  |   |   |   ca <= 0
+  |   |   |   |   sex = female
+  |   |   |   |   |   age <= 60: no (37.55/0.55)
+  |   |   |   |   |   age > 60
+  |   |   |   |   |   |   oldpeak <= 0.4: yes (3.0)
+  |   |   |   |   |   |   oldpeak > 0.4: no (6.0)
+  |   |   |   |   sex = male
+  |   |   |   |   |   age <= 60
+  |   |   |   |   |   |   cp = typ_angina: no (2.0/1.0)
+  |   |   |   |   |   |   cp = asympt: no (8.0)
+  |   |   |   |   |   |   cp = non_anginal
+  |   |   |   |   |   |   |   trestbps <= 138
+  |   |   |   |   |   |   |   |   restecg = left_vent_hyper: yes (2.0)
+  |   |   |   |   |   |   |   |   restecg = normal
+  |   |   |   |   |   |   |   |   |   trestbps <= 124: yes (4.0)
+  |   |   |   |   |   |   |   |   |   trestbps > 124
+  |   |   |   |   |   |   |   |   |   |   trestbps <= 134: no (3.0)
+  |   |   |   |   |   |   |   |   |   |   trestbps > 134: yes (2.29)
+  |   |   |   |   |   |   |   |   restecg = st_t_wave_abnormality: yes (0.0)
+  |   |   |   |   |   |   |   trestbps > 138: no (5.0)
+  |   |   |   |   |   |   cp = atyp_angina: no (15.0/2.0)
+  |   |   |   |   |   age > 60: yes (5.0)
+  |   |   |   ca > 0
+  |   |   |   |   sex = female
+  |   |   |   |   |   ca <= 1: no (11.0/3.0)
+  |   |   |   |   |   ca > 1: yes (4.0)
+  |   |   |   |   sex = male: yes (13.71)
+  |   |   exang = yes
+  |   |   |   thalach <= 163: yes (20.55)
+  |   |   |   thalach > 163: no (4.0/1.0)
+  |   oldpeak > 1.6: yes (21.0)
+  thal = reversable_defect: yes (117.78/1.0)
+   #+end_src
+* Bagging directly
+  | j48    | 146 |
+  | nBayes | 181 |
