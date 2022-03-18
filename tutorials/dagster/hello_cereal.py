@@ -1,22 +1,46 @@
-#!/usr/bin/env python
 import csv
+from typing import List
 
 import requests
 from dagster import job, op, get_dagster_logger
 
 
 @op
-def hello_cereal():
+def download_cereals() -> List[dict]:
     res = requests.get("https://docs.dagster.io/assets/cereal.csv")
     lines = res.text.split("\n")
-    cereals = [row for row in csv.DictReader(lines)]
-    get_dagster_logger().info(f"Found {len(cereals)} cereals")
+    return [row for row in csv.DictReader(lines)]
+
+
+# @op
+# def find_sugariest(cereals) -> str:
+#     sorted_cereals = sorted(cereals, key=lambda cereal: cereal["sugars"])
+#     return sorted_cereals[-1]["name"]
+
+
+@op
+def find_highest_calorie_cereal(cereals) -> str:
+    sorted_cereals = sorted(cereals, key=lambda cereal: cereal["calories"])
+    return sorted_cereals[-1]["name"]
+
+
+@op
+def find_highest_protein_cereal(cereals) -> str:
+    sorted_cereals = sorted(cereals, key=lambda cereal: cereal["protein"])
+    return sorted_cereals[-1]["name"]
+
+
+@op
+def display_results(most_calories: str, most_protein: str):
+    logger = get_dagster_logger()
+    logger.info(f"Most caloric cereal: {most_calories}")
+    logger.info(f"Most protein-rich cereal: {most_protein}")
 
 
 @job
-def hello_cereal_job():
-    hello_cereal()
-
-
-if __name__ == "__main__":
-    result = hello_cereal_job.execute_in_process()
+def diamond():
+    cereals = download_cereals()
+    display_results(
+        most_calories=find_highest_calorie_cereal(cereals),
+        most_protein=find_highest_protein_cereal(cereals),
+    )
